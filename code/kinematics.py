@@ -2,15 +2,10 @@ import math
 import sys
 from math import pi, sin, cos
 import random
-#sys.path.append('/nexus/fenix/')
+
 import numpy as np
 import copy
-
-
 from animation import animate
-#from fnx.animate import animate
-#from common.utils import angle_to_rad, rad_to_angle
-#from fenix.code.kinetic_movement import execute_sequence
 
 
 def angle_to_rad(angle):
@@ -914,7 +909,7 @@ def move_body_straight(ms, delta_x, delta_y, leg_seq=[1, 2, 3, 4], body_to_cente
         ms.body_to_center()
 
 
-ms = create_new_ms(step=0.25)
+ms = create_new_ms(step=1)
 
 move_body_straight(ms, 5, 0)
 
@@ -928,4 +923,4 @@ try:
 except:
     print('Fail')
 
-ms.run_animation(delay=5)
+ms.run_animation(delay=100)

@@ -4,7 +4,7 @@ import mpl_toolkits.mplot3d.axes3d as p3
 from matplotlib import animation
 
 
-def animate(lines_data):
+def animate(lines_data, delay):
 
     fig = plt.figure()
     ax = p3.Axes3D(fig)
@@ -53,7 +53,7 @@ def animate(lines_data):
                                   update,
                                   len(lines_data[0]),
                                   fargs=(lines_data, lines_array),
-                                  interval=100,
+                                  interval=delay,
                                   blit=False)
     #ani.save('fenix1.gif', writer='imagemagick')
     plt.show()
