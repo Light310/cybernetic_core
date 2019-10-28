@@ -16,6 +16,7 @@ def rad_to_angle(rad):
     return rad * 180 / pi
 
 
+
 """
 a = 10.5
 b = 5.5
@@ -23,11 +24,11 @@ c = 14.5
 d = 5.5
 """
 a = 10.5
-b = 5.5
-c = 21.5
-d = 5.5
-ground_z = -10
-k = 18
+b = 5.4
+c = 11.1
+d = 5.4
+ground_z = -2
+k = 16
 turn_angle = pi / 96
 
 z_up = 3
@@ -780,11 +781,11 @@ class MovementSequence:
             Leg.move_end_point(0, 0, 0)
         else:
             Leg.move_end_point(delta[0], delta[1], delta[2])
-    """
+    
     def print_to_sequence_file(self):
         with open(sequence_file, 'w') as f:
-            f.write('\n'.join(str(x) for x in self.angles_history))
-    """
+            f.write('\n'.join(str(x) for x in self.mh.angles_history))
+    
 
     def run_animation(self, delay=100):
         animate(self.lines_history, delay)
@@ -889,7 +890,7 @@ def move_legs_z(ms, legs_delta_z, leg_seq):
     for m in range(num_steps):
         for i in range(len(leg_seq)):
             leg_seq[i].move_end_point(0, 0, leg_delta_step[i])
-            ms.post_movement_actions()
+        ms.post_movement_actions()
 
 
 def leg_move_with_compensation(ms, leg_num, delta_x, delta_y):
@@ -922,13 +923,19 @@ def move_body_straight(ms, delta_x, delta_y, leg_seq=[1, 2, 3, 4], body_to_cente
 
 ms = create_new_ms(step=0.2)
 
-# move_body_straight(ms, 5, 0)
-move_legs_z(ms, [-6, -6, 4, 4], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
-move_legs_z(ms, [10, 10, -10, -10], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
-move_legs_z(ms, [-4, -4, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
+sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\activation.txt'
 
+ms.body_movement(0, 0, 8)
+#move_body_straight(ms, 8, 0)
+#move_legs_z(ms, [4, 4, -6, -6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
+#move_legs_z(ms, [-4, -4, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
+#move_legs_z(ms, [10, 10, -10, -10], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
+#move_legs_z(ms, [-4, -4, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
+ms.print_to_sequence_file()
 # теоретически, при очень длинных движениях оно может упасть, если слишком большой перекос в ногах
 # можно пофиксить, если пересчитывать компенсацию корпусом на каждой итерации движения ноги
+
+# -9, 14
 
 try:
     # ms.body_movement(0, 0, 5)
