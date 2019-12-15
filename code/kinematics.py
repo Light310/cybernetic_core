@@ -3,52 +3,42 @@ import sys
 from math import pi, sin, cos
 import random
 
-import numpy as np
 import copy
+
 from animation import animate
-
-
-def angle_to_rad(angle):
-    return angle * pi / 180
-
-
-def rad_to_angle(rad):
-    return rad * 180 / pi
+from angles_processing import get_leg_angles, target_alpha, target_beta, target_gamma
+from common import a, b, c, d, angle_to_rad, rad_to_angle
 
 
 
-"""
-a = 10.5
-b = 5.5
-c = 14.5
-d = 5.5
-"""
-a = 10.5
-b = 5.4
-c = 11.1
-d = 5.4
-ground_z = -2
-k = 16
+#a = 10.5
+#b = 5.4
+#c = 12.2
+#d = 5.4
+# ground_z = -2 # - deactivated mode
+ground_z = -4 # - deactivated mode tower
+# ground_z = -10 # - activated mode
+# ground_z = -20 # - activated mode tower
+k = 14
 turn_angle = pi / 96
 
-z_up = 3
+z_up = 5
 
-margin = 1  # 1 cm from intersection point
+margin = 3  # 1 cm from intersection point
 
-
-phi_angle = 15
+# phi_angle = 15
+phi_angle = 0
 phi = angle_to_rad(phi_angle)
+
+#target_gamma = 0
+#target_beta = -30
+#target_alpha = -60
 
 body_weight = 500
 leg_CD_weight = 100
 leg_BC_weight = 50
 leg_AB_weight = 150
 leg_OA_weight = 50
-
-start_gamma = -55
-start_beta = -60
-start_alpha = 25
-
 
 def get_angle_by_coords(x1, y1):
     l = math.sqrt(x1 ** 2 + y1 ** 2)
@@ -210,20 +200,6 @@ class MovementHistory:
         intersection = calculate_intersection(LF_13, LF_24)
         legs_center = Point(intersection[0], intersection[1], ground_z)
 
-        """
-        LM_12 = Point((d1.x + d2.x) / 2,
-                      (d1.y + d2.y) / 2,
-                      ground_z)
-        LM_23 = Point((d2.x + d3.x) / 2,
-                      (d2.y + d3.y) / 2,
-                      ground_z)
-        LM_34 = Point((d3.x + d4.x) / 2,
-                      (d3.y + d4.y) / 2,
-                      ground_z)
-        LM_14 = Point((d1.x + d4.x) / 2,
-                      (d1.y + d4.y) / 2,
-                      ground_z)
-        """
         LM_12 = Point(d1.x, d1.y, ground_z)
         LM_23 = Point(d2.x, d2.y, ground_z)
         LM_34 = Point(d3.x, d3.y, ground_z)
@@ -353,14 +329,14 @@ class Leg:
             pass
         O = self.O
         D = self.D
-        angles_pref = [self.alpha, self.beta, self.gamma]
 
         tetta = math.atan2(D.y - O.y, D.x - O.x)
         A = Point(O.x + d * cos(tetta), O.y + d * sin(tetta), O.z)
         l = math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2)
         delta_z = D.z - O.z
-        best_angles = get_leg_angles(l, delta_z, angles_pref)
-        alpha, beta, gamma = best_angles[0], best_angles[1], best_angles[2]
+        #best_angles = get_leg_angles(l, delta_z)
+        #alpha, beta, gamma = best_angles[0], best_angles[1], best_angles[2]
+        alpha, beta, gamma = get_leg_angles(l, delta_z)
 
         Bx = a * cos(alpha)
         By = a * sin(alpha)
@@ -389,11 +365,12 @@ class Leg:
         self.tetta, self.alpha, self.beta, self.gamma = tetta, alpha, beta, gamma
         #print('After angles : {0}'.format(self))
 
-
-def get_leg_angles(delta_x, delta_z, angles_pref):
-    #print('Looking for angles for ({0}, {1})'.format(delta_x, delta_z))
+"""
+def get_leg_angles(delta_x, delta_z):
+    print('Looking for angles for ({0}, {1})'.format(delta_x, delta_z))
     possible_angles = find_angles(delta_x, delta_z)
 
+    # recalculating to check for some error
     for item in possible_angles:
         alpha = item[0]
         beta = item[1]
@@ -405,10 +382,11 @@ def get_leg_angles(delta_x, delta_z, angles_pref):
         Dx = Cx + c * cos(alpha + beta + gamma)
         Dy = Cy + c * sin(alpha + beta + gamma)
         if abs(Dx - delta_x) > 0.01 or abs(Dy - delta_z) > 0.01:
+            raise Exception('Recalculating error')
             print('WTF')
 
-    return get_best_angles(angles_pref, possible_angles)
-
+    return get_best_angles(possible_angles)
+"""
 
 def angles_str(angles):
     result = ''
@@ -416,43 +394,34 @@ def angles_str(angles):
         result += '{0} '.format(round(180 * item / pi, 2))
     return result
 
-
-def get_best_angles(angles_pref, all_angles):
+"""
+def check_angles(angles):
+    alpha = rad_to_angle(angles[0])
+    beta = rad_to_angle(angles[1])
+    gamma = rad_to_angle(angles[2])
+    angles_converted = str([round(x, 2) for x in [alpha, beta, gamma]])
+    if alpha < -80 or alpha > 80:
+        return False, angles_converted + ' alpha={0}'.format(alpha)
+    if beta < -80 or beta > 80:
+        return False,  angles_converted + '. beta={0}'.format(beta)
+    if gamma < -80 or gamma > 80:
+        return False, angles_converted + '. gamma={0}'.format(gamma)
+    if alpha + beta < -90 or alpha + beta > 80:
+        return False, angles_converted + '. alpha + beta = {0}'.format(alpha + beta)
+    if alpha + beta + gamma < -135 or alpha + beta + gamma > -45:
+        return False, angles_converted + '. alpha + beta = {0}'.format(alpha + beta + gamma)
+    
+    return True, 'All ok'
+"""
+"""
+def get_best_angles(all_angles):
     min_distance = 1000
     best_angles = None
     print_angles = False
     for item in all_angles:
-        #print(angles_str(item))
-        alpha = item[0]
-        beta = item[1]
-        gamma = item[2]
-        if alpha < angle_to_rad(-60) or alpha > angle_to_rad(80):
-            if print_angles:
-                print('Bad alpha : {0}'.format(rad_to_angle(alpha)))
-            continue
-        if beta < angle_to_rad(-120) or beta > angle_to_rad(60):
-            if print_angles:
-                print('Bad beta : {0}'.format(rad_to_angle(beta)))
-            continue
-        if (alpha + beta < angle_to_rad(-90)) or (alpha + beta > angle_to_rad(60)):
-            if print_angles:
-                print('Bad alpha + beta : {0}'.format(rad_to_angle(alpha + beta)))
-            continue
-        #if gamma < angle_to_rad(-120) or gamma > angle_to_rad(15):
-        if beta + gamma < angle_to_rad(-160):
-            if print_angles:
-                print('Bad beta + gamma : {0}'.format(rad_to_angle(beta + gamma)))
-            continue
-        if gamma < angle_to_rad(-120) or gamma > angle_to_rad(15):
-            if print_angles:
-                print('Bad gamma : {0}'.format(rad_to_angle(gamma)))
-            continue
-        if (alpha + beta + gamma < angle_to_rad(-150)) or (alpha + beta + gamma > angle_to_rad(-55)):
-            if print_angles:
-                print('Bad alpha + beta + gamma : {0}'.format(rad_to_angle(alpha + beta + gamma)))
-            continue
-        cur_distance = get_angles_distance(item, angles_pref)
-        cur_distance += 10 * get_angles_distance(item, [start_alpha, start_beta, start_gamma])
+        if not check_angles(item)[0]:
+            continue        
+        cur_distance = get_angles_distance(item, [target_alpha, target_beta, target_gamma])
         # print('Angles : {0}. Distance : {1}'.format(angles_str(item), cur_distance))
         if cur_distance <= min_distance:
             min_distance = cur_distance
@@ -460,11 +429,13 @@ def get_best_angles(angles_pref, all_angles):
     # print(angles_str(best_angles), min_distance)
     if best_angles is None:
         #print('No suitable angles found. Halt')
-        raise Exception('No angles')
+        for angle in all_angles:
+            print(check_angles(angle)[1])
+        raise Exception('No angles\n')
         # sys.exit(1)
     return best_angles
-
-
+"""
+"""
 def find_angles(Dx, Dy):
     results = []
     full_dist = math.sqrt(Dx ** 2 + Dy ** 2)
@@ -475,6 +446,9 @@ def find_angles(Dx, Dy):
 
     #for k in np.arange(-35.0, 35.0, 0.1):
     for k in np.arange(-45.0, 45.0, 0.5):
+        if stable_mode and k != 0:
+            continue
+
         ksi = angle_to_rad(k)
 
         Cx = Dx + c * math.cos(math.pi / 2 + ksi)
@@ -511,14 +485,14 @@ def find_angles(Dx, Dy):
                 results.append([alpha, beta, gamma])
 
     return results
-
-
+"""
+"""
 def get_angles_distance(angles1, angles2):
     # weight of gamma is 1.5 !!!
     return math.sqrt((angles1[0] - angles2[0]) ** 2 +
                      (angles1[1] - angles2[1]) ** 2 +
                      1.5 * (angles1[2] - angles2[2]) ** 2)
-
+"""
 ###########################################################################
 
 
@@ -568,68 +542,7 @@ class MovementSequence:
 
         # LM - legs middle point, LM_12 - middle of legs 1 and 2
         # ALL projected to self.ground_z
-    """
-    def calculate_unsupporting_leg(self):
-        self.mass_center = self.calculate_mass_center()
-        mass_center_xy = self.mass_center
-        legs_center = self.calculate_basement_points()
-        # LM_12 - middle of line between legs 1 and 2
-        LM_12 = Point((self.Leg1.D.x + self.Leg2.D.x) / 2,
-                      (self.Leg1.D.y + self.Leg2.D.y) / 2,
-                      self.ground_z)
-        LM_23 = Point((self.Leg2.D.x + self.Leg3.D.x) / 2,
-                      (self.Leg2.D.y + self.Leg3.D.y) / 2,
-                      self.ground_z)
-        LM_34 = Point((self.Leg3.D.x + self.Leg4.D.x) / 2,
-                      (self.Leg3.D.y + self.Leg4.D.y) / 2,
-                      self.ground_z)
-        LM_14 = Point((self.Leg1.D.x + self.Leg4.D.x) / 2,
-                      (self.Leg1.D.y + self.Leg4.D.y) / 2,
-                      self.ground_z)
-
-        LF_12 = LinearFunc(point1=legs_center, point2=LM_12)
-        LF_23 = LinearFunc(point1=legs_center, point2=LM_23)
-        LF_34 = LinearFunc(point1=legs_center, point2=LM_34)
-        LF_14 = LinearFunc(point1=legs_center, point2=LM_14)
-
-        x, y = mass_center_xy[0], mass_center_xy[1]
-        #self.mass_center_distance = [round(legs_center.x - x, 3), round(legs_center.y - y, 3)]
-
-        if LF_14.get_x(y) <= x and LF_12.get_y(x) <= y:
-            self.unsupporting_leg = self.Leg3
-            #sector = 1
-        if LF_23.get_x(y) <= x and LF_12.get_y(x) > y:
-            self.unsupporting_leg = self.Leg4
-            #sector = 2
-        if LF_23.get_x(y) > x and LF_34.get_y(x) > y:
-            self.unsupporting_leg = self.Leg1
-            #sector = 3
-        if LF_14.get_x(y) > x and LF_34.get_y(x) <= y:
-            self.unsupporting_leg = self.Leg2
-            #sector = 4
-
-        if self.target_unsupporting_leg is None:
-            pass
-            #print('No target_unsupporting_leg')
-        else:
-        #try:
-            target_leg_sector = define_sector(LF_12, LF_23, LF_34, LF_14,
-                                   self.target_unsupporting_leg.D.x,
-                                   self.target_unsupporting_leg.D.y)
-            if target_leg_sector == 1:
-                distance_1 = distance_to_line(self.mass_center[0], self.mass_center[1], LF_23, 3, 1)
-                distance_2 = distance_to_line(self.mass_center[0], self.mass_center[1], LF_34, 3, 0)
-            if target_leg_sector == 2:
-                distance_1 = distance_to_line(self.mass_center[0], self.mass_center[1], LF_14, 4, 1)
-                distance_2 = distance_to_line(self.mass_center[0], self.mass_center[1], LF_34, 4, 0)
-            if target_leg_sector == 3:
-                distance_1 = distance_to_line(self.mass_center[0], self.mass_center[1], LF_14, 1, 1)
-                distance_2 = distance_to_line(self.mass_center[0], self.mass_center[1], LF_12, 1, 0)
-            if target_leg_sector == 4:
-                distance_1 = distance_to_line(self.mass_center[0], self.mass_center[1], LF_23, 2, 1)
-                distance_2 = distance_to_line(self.mass_center[0], self.mass_center[1], LF_12, 2, 0)
-            self.distances_to_margin = [abs(distance_1 - mc_magrin), abs(distance_2 - mc_magrin)]
-    """
+   
     def body_movement(self, delta_x, delta_y, delta_z, leg_up=None, leg_up_delta=[0, 0, 0]):
         if delta_x == delta_y == delta_z == 0:
             #print('No movement required')
@@ -811,19 +724,19 @@ def create_new_ms(step=0.5, ms_array=None):
     if ms_array is None:
         O1 = Point(4.5, 4.5, 0)
         D1 = Point(k, k, ground_z)
-        Leg1 = Leg(1, "Leg1", O1, D1, angle_to_rad(start_alpha), angle_to_rad(start_beta), angle_to_rad(start_gamma))
+        Leg1 = Leg(1, "Leg1", O1, D1, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
 
         O2 = Point(4.5, -4.5, 0)
         D2 = Point(k, -k, ground_z)
-        Leg2 = Leg(2, "Leg2", O2, D2, angle_to_rad(start_alpha), angle_to_rad(start_beta), angle_to_rad(start_gamma))
+        Leg2 = Leg(2, "Leg2", O2, D2, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
 
         O3 = Point(-4.5, -4.5, 0)
         D3 = Point(-k, -k, ground_z)
-        Leg3 = Leg(3, "Leg3", O3, D3, angle_to_rad(start_alpha), angle_to_rad(start_beta), angle_to_rad(start_gamma))
+        Leg3 = Leg(3, "Leg3", O3, D3, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
 
         O4 = Point(-4.5, 4.5, 0)
         D4 = Point(-k, k, ground_z)
-        Leg4 = Leg(4, "Leg4", O4, D4, angle_to_rad(start_alpha), angle_to_rad(start_beta), angle_to_rad(start_gamma))
+        Leg4 = Leg(4, "Leg4", O4, D4, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
     else:
         for i in range(4):
             leg = ms_array[i]
@@ -923,21 +836,24 @@ def move_body_straight(ms, delta_x, delta_y, leg_seq=[1, 2, 3, 4], body_to_cente
 
 ms = create_new_ms(step=0.2)
 
-sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\activation.txt'
+sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\deactivation_tow.txt'
 
-ms.body_movement(0, 0, 8)
-#move_body_straight(ms, 8, 0)
+#move_body_straight(ms, -4, 0, leg_seq=[4, 3, 2, 1], body_to_center=True)
+#move_body_straight(ms, 4, 0, body_to_center=True)
 #move_legs_z(ms, [4, 4, -6, -6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
 #move_legs_z(ms, [-4, -4, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
 #move_legs_z(ms, [10, 10, -10, -10], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
 #move_legs_z(ms, [-4, -4, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
-ms.print_to_sequence_file()
+#ms.print_to_sequence_file()
 # теоретически, при очень длинных движениях оно может упасть, если слишком большой перекос в ногах
 # можно пофиксить, если пересчитывать компенсацию корпусом на каждой итерации движения ноги
 
 # -9, 14
 
 try:
+    
+    ms.body_movement(0, 0, 14)
+    ms.body_movement(0, 0, -14)
     # ms.body_movement(0, 0, 5)
     #turn_body(ms, 15)
     pass
