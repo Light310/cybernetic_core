@@ -4,13 +4,12 @@ import numpy as np
 
 from common import a, b, c, d, angle_to_rad, rad_to_angle
 
+target_alpha = 0
+target_beta = 0
 target_gamma = 0
-target_beta = -30
-target_alpha = -60
 
-
-def get_leg_angles(delta_x, delta_z):
-    print('Looking for angles for ({0}, {1})'.format(delta_x, delta_z))
+def get_leg_angles(delta_x, delta_z, prev_angles):
+    #print('Looking for angles for ({0}, {1})'.format(delta_x, delta_z))
     possible_angles = find_angles(delta_x, delta_z)
 
     # recalculating to check for some error
@@ -26,27 +25,34 @@ def get_leg_angles(delta_x, delta_z):
         Dy = Cy + c * sin(alpha + beta + gamma)
         if abs(Dx - delta_x) > 0.01 or abs(Dy - delta_z) > 0.01:
             raise Exception('Recalculating error')
-            print('WTF')
 
-    return get_best_angles(possible_angles)
+    return get_best_angles(possible_angles, prev_angles)
 
-def get_best_angles(all_angles):
+def get_best_angles(all_angles, prev_angles):
     min_distance = 1000
     best_angles = None
-    print_angles = False
+    min_distance_num = 0
+    
     for item in all_angles:
         if not check_angles(item)[0]:
             continue        
-        cur_distance = get_angles_distance(item, [target_alpha, target_beta, target_gamma])
-        # print('Angles : {0}. Distance : {1}'.format(angles_str(item), cur_distance))
+        cur_distance = get_angles_distance(item, prev_angles)
+        
         if cur_distance <= min_distance:
             min_distance = cur_distance
             best_angles = item[:]
-    # print(angles_str(best_angles), min_distance)
+
+    if min_distance > 0.1:
+        min_distance_num += 1        
+        if min_distance_num > 1:
+            
+            print('best_angles : {0}'.format([rad_to_angle(x) for x in best_angles]))
+            raise Exception('Min distance found : {0}'.format(min_distance))
+
     if best_angles is None:
         #print('No suitable angles found. Halt')
         for angle in all_angles:
-            print(check_angles(angle)[1])
+            print(check_angles(angle))
         raise Exception('No angles\n')
         # sys.exit(1)
     return best_angles
@@ -58,13 +64,16 @@ def check_angles(angles):
     angles_converted = str([round(x, 2) for x in [alpha, beta, gamma]])
     if alpha < -80 or alpha > 80:
         return False, angles_converted + ' alpha={0}'.format(alpha)
-    if beta < -80 or beta > 80:
+    if beta < -120 or beta > 80:
         return False,  angles_converted + '. beta={0}'.format(beta)
-    if gamma < -80 or gamma > 80:
+    if gamma < -80 or gamma > 15: # 15 is cuz of construction of last joint
         return False, angles_converted + '. gamma={0}'.format(gamma)
-    if alpha + beta < -90 or alpha + beta > 80:
+    print('Hello')
+    print('1 alpha + beta = {0}'.format(alpha + beta))
+    if ((alpha + beta) < -110) or ((alpha + beta) > 80):
+        print('2 alpha + beta = {0}'.format(alpha + beta))
         return False, angles_converted + '. alpha + beta = {0}'.format(alpha + beta)
-    if alpha + beta + gamma < -135 or alpha + beta + gamma > -45:
+    if ((alpha + beta + gamma) < -100) or ((alpha + beta + gamma) > -80):
         return False, angles_converted + '. alpha + beta = {0}'.format(alpha + beta + gamma)
     
     return True, 'All ok'
@@ -124,3 +133,9 @@ def get_angles_distance(angles1, angles2):
                      (angles1[1] - angles2[1]) ** 2 +
                      1.5 * (angles1[2] - angles2[2]) ** 2)
 
+
+def angles_str(angles):
+    result = ''
+    for item in angles:
+        result += '{0} '.format(round(180 * item / pi, 2))
+    return result
