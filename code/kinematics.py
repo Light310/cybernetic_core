@@ -12,11 +12,14 @@ from common import a, b, c, d, angle_to_rad, rad_to_angle
 
 
 # ground_z = -2 # - deactivated mode
-ground_z = -4 # - deactivated mode tower
+# ground_z = -3 # - deactivated mode tower
 # ground_z = -10 # - activated mode
-#ground_z = -20 # - activated mode tower
-k = 13
+# ground_z = -24 # - activated mode tower
+
+ground_z = -22
+k = 14
 turn_angle = pi / 96
+mode = 'stable'
 
 z_up = 7
 
@@ -329,9 +332,9 @@ class Leg:
         A = Point(O.x + d * cos(tetta), O.y + d * sin(tetta), O.z)
         l = math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2)
         delta_z = D.z - O.z
-        #best_angles = get_leg_angles(l, delta_z)
-        #alpha, beta, gamma = best_angles[0], best_angles[1], best_angles[2]
-        alpha, beta, gamma = get_leg_angles(l, delta_z, [self.alpha, self.beta, self.gamma])
+
+        global mode
+        alpha, beta, gamma = get_leg_angles(l, delta_z, [self.alpha, self.beta, self.gamma], mode=mode)
 
         Bx = a * cos(alpha)
         By = a * sin(alpha)
@@ -706,34 +709,26 @@ def move_body_straight(ms, delta_x, delta_y, leg_seq=[1, 2, 3, 4], body_to_cente
 ms = create_new_ms(step=0.2)
 
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\activation.txt'
-sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\forward_4.txt'
-#sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\deactivation.txt'
+#sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\forward_4.txt'
+sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\deactivation.txt'
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\look_around.txt'
 
-#move_body_straight(ms, -4, 0, leg_seq=[4, 3, 2, 1], body_to_center=True)
-#move_body_straight(ms, 4, 0, body_to_center=True)
-#move_legs_z(ms, [4, 4, -6, -6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
-#move_legs_z(ms, [-4, -4, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
-#move_legs_z(ms, [10, 10, -10, -10], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
-#move_legs_z(ms, [-4, -4, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
-#ms.print_to_sequence_file()
-# теоретически, при очень длинных движениях оно может упасть, если слишком большой перекос в ногах
-# можно пофиксить, если пересчитывать компенсацию корпусом на каждой итерации движения ноги
-
-# -9, 14
-
+# k = 13 : -3 -> -24
+# k = 14 : trying -3 -> 22
 try:
-    
-    ms.body_movement(0, 0, 20)
+    #mode = 'stable'
+    #ms.body_movement(0, 0, 19)
     #move_legs_z(ms, [3, 3, -3, -3], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
     #move_legs_z(ms, [-6, -6, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
     #move_legs_z(ms, [3, 3, -3, -3], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
+    #mode = 'moving'
     #move_body_straight(ms, 4, 0, body_to_center=True)
-    #ms.body_movement(0, 0, -18)
+    mode = 'stable'
+    ms.body_movement(0, 0, -19)
     #move_body_straight(ms, 2, 0, body_to_center=True)
     #turn_body(ms, 15)
     
-    #ms.print_to_sequence_file()
+    ms.print_to_sequence_file()
     pass
 except:
     print('Fail')

@@ -8,7 +8,7 @@ target_alpha = 0
 target_beta = 0
 target_gamma = 0
 
-def get_leg_angles(delta_x, delta_z, prev_angles):
+def get_leg_angles(delta_x, delta_z, prev_angles, mode="moving"):
     #print('Looking for angles for ({0}, {1})'.format(delta_x, delta_z))
     possible_angles = find_angles(delta_x, delta_z)
 
@@ -26,15 +26,15 @@ def get_leg_angles(delta_x, delta_z, prev_angles):
         if abs(Dx - delta_x) > 0.01 or abs(Dy - delta_z) > 0.01:
             raise Exception('Recalculating error')
 
-    return get_best_angles(possible_angles, prev_angles)
+    return get_best_angles(possible_angles, prev_angles, mode)
 
-def get_best_angles(all_angles, prev_angles):
+def get_best_angles(all_angles, prev_angles, mode):
     min_distance = 1000
     best_angles = None
     min_distance_num = 0
     
     for item in all_angles:
-        if not check_angles(item)[0]:
+        if not check_angles(item, mode)[0]:
             continue        
         cur_distance = get_angles_distance(item, prev_angles)
         
@@ -52,12 +52,16 @@ def get_best_angles(all_angles, prev_angles):
     if best_angles is None:
         #print('No suitable angles found. Halt')
         for angle in all_angles:
-            print(check_angles(angle))
+            print(check_angles(angle, mode)[1])
         raise Exception('No angles\n')
         # sys.exit(1)
     return best_angles
 
-def check_angles(angles):
+def check_angles(angles, mode):
+    """
+    mode = 'stable' means all 4 legs are standing, and more movement available
+    mode = 'moving' default, at least 1 leg is up
+    """
     alpha = rad_to_angle(angles[0])
     beta = rad_to_angle(angles[1])
     gamma = rad_to_angle(angles[2])
@@ -66,15 +70,16 @@ def check_angles(angles):
         return False, angles_converted + ' alpha={0}'.format(alpha)
     if beta < -120 or beta > 80:
         return False,  angles_converted + '. beta={0}'.format(beta)
-    if gamma < -80 or gamma > 15: # 15 is cuz of construction of last joint
+    if gamma < -90 or gamma > 15: # 15 is cuz of construction of last joint
         return False, angles_converted + '. gamma={0}'.format(gamma)
-    print('Hello')
-    print('1 alpha + beta = {0}'.format(alpha + beta))
-    if ((alpha + beta) < -110) or ((alpha + beta) > 80):
-        print('2 alpha + beta = {0}'.format(alpha + beta))
+    if alpha + beta < -110 or alpha + beta > 80:
         return False, angles_converted + '. alpha + beta = {0}'.format(alpha + beta)
-    if ((alpha + beta + gamma) < -100) or ((alpha + beta + gamma) > -80):
-        return False, angles_converted + '. alpha + beta = {0}'.format(alpha + beta + gamma)
+    if mode == 'stable':
+        if alpha + beta + gamma < -120 or alpha + beta + gamma > -60:
+            return False, angles_converted + '. Stable mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
+    else:
+        if alpha + beta + gamma < -100 or alpha + beta + gamma > -80:
+            return False, angles_converted + '. Moving mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
     
     return True, 'All ok'
 
