@@ -51,8 +51,8 @@ def get_best_angles(all_angles, prev_angles, mode):
 
     if best_angles is None:
         #print('No suitable angles found. Halt')
-        for angle in all_angles:
-            print(check_angles(angle, mode)[1])
+        #for angle in all_angles:
+        #    print(check_angles(angle, mode)[1])
         raise Exception('No angles\n')
         # sys.exit(1)
     return best_angles
@@ -66,7 +66,7 @@ def check_angles(angles, mode):
     beta = rad_to_angle(angles[1])
     gamma = rad_to_angle(angles[2])
     angles_converted = str([round(x, 2) for x in [alpha, beta, gamma]])
-    if alpha < -80 or alpha > 80:
+    if alpha < -70 or alpha > 80:
         return False, angles_converted + ' alpha={0}'.format(alpha)
     if beta < -120 or beta > 80:
         return False,  angles_converted + '. beta={0}'.format(beta)
@@ -78,7 +78,7 @@ def check_angles(angles, mode):
         if alpha + beta + gamma < -120 or alpha + beta + gamma > -60:
             return False, angles_converted + '. Stable mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
     else:
-        if alpha + beta + gamma < -100 or alpha + beta + gamma > -80:
+        if alpha + beta + gamma < -105 or alpha + beta + gamma > -75:
             return False, angles_converted + '. Moving mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
     
     return True, 'All ok'

@@ -13,17 +13,17 @@ from common import a, b, c, d, angle_to_rad, rad_to_angle
 
 # ground_z = -2 # - deactivated mode
 # ground_z = -3 # - deactivated mode tower
-# ground_z = -10 # - activated mode
+ground_z = -12 # - activated mode
 # ground_z = -24 # - activated mode tower
 
-ground_z = -22
+#ground_z = -22
 k = 14
 turn_angle = pi / 96
 mode = 'stable'
 
-z_up = 7
+z_up = 5
 
-margin = 2  # 1 cm from intersection point
+margin = 4  # cm from intersection point
 
 # phi_angle = 15
 phi_angle = 0
@@ -709,26 +709,54 @@ def move_body_straight(ms, delta_x, delta_y, leg_seq=[1, 2, 3, 4], body_to_cente
 ms = create_new_ms(step=0.2)
 
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\activation.txt'
-#sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\forward_4.txt'
-sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\deactivation.txt'
+sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\forward_4.txt'
+#sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\deactivation.txt'
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\look_around.txt'
 
-# k = 13 : -3 -> -24
-# k = 14 : trying -3 -> 22
+"""
+for ground_z in range(-6, -15, -1):
+    for margin in [2, 2.5, 3]:
+        for k in [12, 13, 14, 15]:
+            print('Trying ground_z = {0}, margin = {1}. k = {2}'.format(ground_z, margin, k))
+            try:
+                #mode = 'stable'
+                mode = 'moving'
+                move_body_straight(ms, 4, 0, body_to_center=True)
+                print('############################# Success #############################')
+                pass
+            except:
+                print('Fail')
+
+Trying ground_z = -6, margin = 2. k = 12
+############################# Success #############################
+Trying ground_z = -6, margin = 2. k = 13
+############################# Success #############################
+Trying ground_z = -6, margin = 2. k = 14
+############################# Success #############################
+Trying ground_z = -6, margin = 2. k = 15
+############################# Success #############################
+"""
+
+ground_z = -6
+margin = 2
+k = 12
+
 try:
     #mode = 'stable'
-    #ms.body_movement(0, 0, 19)
+    mode = 'moving'
+    #ms.body_movement(0, 0, 6)
     #move_legs_z(ms, [3, 3, -3, -3], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
     #move_legs_z(ms, [-6, -6, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
     #move_legs_z(ms, [3, 3, -3, -3], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
     #mode = 'moving'
-    #move_body_straight(ms, 4, 0, body_to_center=True)
-    mode = 'stable'
-    ms.body_movement(0, 0, -19)
+    move_body_straight(ms, 4, 0, body_to_center=True)
+    #mode = 'stable'
+    #ms.body_movement(0, 0, -6)
     #move_body_straight(ms, 2, 0, body_to_center=True)
     #turn_body(ms, 15)
     
     ms.print_to_sequence_file()
+    print('############################# Success #############################')
     pass
 except:
     print('Fail')
