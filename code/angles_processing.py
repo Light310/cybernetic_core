@@ -74,12 +74,18 @@ def check_angles(angles, mode):
         return False, angles_converted + '. gamma={0}'.format(gamma)
     if alpha + beta < -110 or alpha + beta > 80:
         return False, angles_converted + '. alpha + beta = {0}'.format(alpha + beta)
-    if mode == 'stable':
+    if mode == 'stable130':
+        if alpha + beta + gamma < -130 or alpha + beta + gamma > -50:
+            return False, angles_converted + '. stable130 mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
+    elif mode == 'stable120':
         if alpha + beta + gamma < -120 or alpha + beta + gamma > -60:
-            return False, angles_converted + '. Stable mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
+            return False, angles_converted + '. stable120 mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
+    elif mode == 'stable110':
+        if alpha + beta + gamma < -110 or alpha + beta + gamma > -70:
+            return False, angles_converted + '. stable110 mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
     else:
-        if alpha + beta + gamma < -105 or alpha + beta + gamma > -75:
-            return False, angles_converted + '. Moving mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
+        if alpha + beta + gamma < -100 or alpha + beta + gamma > -80:
+            return False, angles_converted + '. stable100 mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
     
     return True, 'All ok'
 

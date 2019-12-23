@@ -2,12 +2,13 @@ import math
 import sys
 from math import pi, sin, cos
 import random
+import os
 
 import copy
 
 from animation import animate
 from angles_processing import get_leg_angles, angles_str, target_alpha, target_beta, target_gamma
-from common import a, b, c, d, angle_to_rad, rad_to_angle
+from common import a, b, c, d, angle_to_rad, rad_to_angle, create_sequence_file
 
 
 
@@ -708,42 +709,38 @@ def move_body_straight(ms, delta_x, delta_y, leg_seq=[1, 2, 3, 4], body_to_cente
 
 ms = create_new_ms(step=0.2)
 
+
+
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\activation.txt'
-sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\forward_4.txt'
+#sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\forward_4.txt'
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\deactivation.txt'
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\look_around.txt'
 
+
+for margin in [3, 4, 5]:
+    for k in [12, 13, 14]:
+        for ground_z in [-6, -7, -8, -9, -10, -20, -21, -22, -23, -24, -25]:            
+            for mode in ['stable130', 'stable120', 'stable110', 'stable100']:
+                print('Trying margin = {0}, k = {1}. ground_z = {2}, mode = {3}'.format(margin, k, ground_z, mode))
+                try:
+                    sequence_file = create_sequence_file({'margin':margin, 'k':k, 'z':ground_z, 'mode':mode})
+                    if os.path.exists(sequence_file):
+                        print('Already Exists')
+                        continue
+                    
+                    move_body_straight(ms, 4, 0, body_to_center=True)
+                    ms.print_to_sequence_file()
+                    print('############################# Success #############################')
+                    #pass
+                except:
+                    print('Fail')
+
+
+
 """
-for ground_z in range(-6, -15, -1):
-    for margin in [2, 2.5, 3]:
-        for k in [12, 13, 14, 15]:
-            print('Trying ground_z = {0}, margin = {1}. k = {2}'.format(ground_z, margin, k))
-            try:
-                #mode = 'stable'
-                mode = 'moving'
-                move_body_straight(ms, 4, 0, body_to_center=True)
-                print('############################# Success #############################')
-                pass
-            except:
-                print('Fail')
-
-Trying ground_z = -6, margin = 2. k = 12
-############################# Success #############################
-Trying ground_z = -6, margin = 2. k = 13
-############################# Success #############################
-Trying ground_z = -6, margin = 2. k = 14
-############################# Success #############################
-Trying ground_z = -6, margin = 2. k = 15
-############################# Success #############################
-"""
-
-ground_z = -6
-margin = 2
-k = 12
-
 try:
     #mode = 'stable'
-    mode = 'moving'
+    mode = 'stable130'
     #ms.body_movement(0, 0, 6)
     #move_legs_z(ms, [3, 3, -3, -3], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
     #move_legs_z(ms, [-6, -6, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
@@ -762,3 +759,4 @@ except:
     print('Fail')
 
 ms.run_animation(delay=5)
+"""
