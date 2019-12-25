@@ -243,7 +243,7 @@ class MovementHistory:
         # leg2 tetta = -45, leg3 tetta = -135, leg4 tetta = 135
 
         position = []
-        for leg in [leg1, leg4, leg3, leg2]:
+        for leg in [leg1, leg2, leg3, leg4]:
             position.append(round(rad_to_angle(leg.gamma), 2))
             position.append(round(rad_to_angle(leg.beta), 2))
             position.append(-1 * round(rad_to_angle(leg.alpha), 2))
@@ -707,7 +707,7 @@ def move_body_straight(ms, delta_x, delta_y, leg_seq=[1, 2, 3, 4], body_to_cente
         ms.body_to_center()
 
 
-ms = create_new_ms(step=0.2)
+
 
 
 
@@ -716,25 +716,34 @@ ms = create_new_ms(step=0.2)
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\deactivation.txt'
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\look_around.txt'
 
-
+"""
 for margin in [3, 4, 5]:
     for k in [12, 13, 14]:
-        for ground_z in [-6, -7, -8, -9, -10, -20, -21, -22, -23, -24, -25]:            
-            for mode in ['stable130', 'stable120', 'stable110', 'stable100']:
-                print('Trying margin = {0}, k = {1}. ground_z = {2}, mode = {3}'.format(margin, k, ground_z, mode))
-                try:
-                    sequence_file = create_sequence_file({'margin':margin, 'k':k, 'z':ground_z, 'mode':mode})
-                    if os.path.exists(sequence_file):
-                        print('Already Exists')
-                        continue
-                    
-                    move_body_straight(ms, 4, 0, body_to_center=True)
-                    ms.print_to_sequence_file()
-                    print('############################# Success #############################')
-                    #pass
-                except:
-                    print('Fail')
+        for z_up in [5, 7]:
+            for ground_z in [-6, -7, -8, -9, -10, -20, -21, -22, -23, -24, -25]:            
+                for mode in ['stable130', 'stable120', 'stable110', 'stable100']:
+                    print('Trying margin = {0}, k = {1}, z_up = {2}, ground_z = {3}, mode = {4}'.format(margin, k, z_up, ground_z, mode))
+                    try:
+                        ms = create_new_ms(step=0.2)
+                        move_body_straight(ms, 4, 0, body_to_center=True)
+                        sequence_file = create_sequence_file({'margin':margin, 'k':k, 'z_up': z_up, 'z':ground_z, 'mode':mode})
+                        ms.print_to_sequence_file()
+                        print('############################# Success #############################')
+                        #pass
+                    except:
+                        print('Fail')
+"""
 
+margin = 5 
+ground_z = -6
+z_up = 5
+k = 14
+mode = "stable120"
+ms = create_new_ms(step=0.2)
+move_body_straight(ms, 4, 0, body_to_center=True)
+sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\forward_4.txt'
+ms.print_to_sequence_file()
+ms.run_animation(delay=5)
 
 
 """

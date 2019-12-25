@@ -13,6 +13,7 @@ def get_leg_angles(delta_x, delta_z, prev_angles, mode="moving"):
     possible_angles = find_angles(delta_x, delta_z)
 
     # recalculating to check for some error
+    """
     for item in possible_angles:
         alpha = item[0]
         beta = item[1]
@@ -25,6 +26,7 @@ def get_leg_angles(delta_x, delta_z, prev_angles, mode="moving"):
         Dy = Cy + c * sin(alpha + beta + gamma)
         if abs(Dx - delta_x) > 0.01 or abs(Dy - delta_z) > 0.01:
             raise Exception('Recalculating error')
+    """
 
     return get_best_angles(possible_angles, prev_angles, mode)
 
