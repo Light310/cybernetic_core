@@ -2,28 +2,29 @@ import math
 import sys
 from math import pi, sin, cos
 import random
+import os
 
 import copy
 
 from animation import animate
 from angles_processing import get_leg_angles, angles_str, target_alpha, target_beta, target_gamma
-from common import a, b, c, d, angle_to_rad, rad_to_angle
+from common import a, b, c, d, angle_to_rad, rad_to_angle, create_sequence_file
 
 
 
 # ground_z = -2 # - deactivated mode
 # ground_z = -3 # - deactivated mode tower
-# ground_z = -10 # - activated mode
+ground_z = -12 # - activated mode
 # ground_z = -24 # - activated mode tower
 
-ground_z = -22
+#ground_z = -22
 k = 14
 turn_angle = pi / 96
 mode = 'stable'
 
-z_up = 7
+z_up = 5
 
-margin = 2  # 1 cm from intersection point
+margin = 4  # cm from intersection point
 
 # phi_angle = 15
 phi_angle = 0
@@ -242,7 +243,7 @@ class MovementHistory:
         # leg2 tetta = -45, leg3 tetta = -135, leg4 tetta = 135
 
         position = []
-        for leg in [leg1, leg4, leg3, leg2]:
+        for leg in [leg1, leg2, leg3, leg4]:
             position.append(round(rad_to_angle(leg.gamma), 2))
             position.append(round(rad_to_angle(leg.beta), 2))
             position.append(-1 * round(rad_to_angle(leg.alpha), 2))
@@ -706,31 +707,65 @@ def move_body_straight(ms, delta_x, delta_y, leg_seq=[1, 2, 3, 4], body_to_cente
         ms.body_to_center()
 
 
-ms = create_new_ms(step=0.2)
+
+
+
 
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\activation.txt'
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\forward_4.txt'
-sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\deactivation.txt'
+#sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\deactivation.txt'
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\look_around.txt'
 
-# k = 13 : -3 -> -24
-# k = 14 : trying -3 -> 22
+"""
+for margin in [3, 4, 5]:
+    for k in [12, 13, 14]:
+        for z_up in [5, 7]:
+            for ground_z in [-6, -7, -8, -9, -10, -20, -21, -22, -23, -24, -25]:            
+                for mode in ['stable130', 'stable120', 'stable110', 'stable100']:
+                    print('Trying margin = {0}, k = {1}, z_up = {2}, ground_z = {3}, mode = {4}'.format(margin, k, z_up, ground_z, mode))
+                    try:
+                        ms = create_new_ms(step=0.2)
+                        move_body_straight(ms, 4, 0, body_to_center=True)
+                        sequence_file = create_sequence_file({'margin':margin, 'k':k, 'z_up': z_up, 'z':ground_z, 'mode':mode})
+                        ms.print_to_sequence_file()
+                        print('############################# Success #############################')
+                        #pass
+                    except:
+                        print('Fail')
+"""
+
+margin = 5 
+ground_z = -6
+z_up = 5
+k = 14
+mode = "stable120"
+ms = create_new_ms(step=0.2)
+move_body_straight(ms, 4, 0, body_to_center=True)
+sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\forward_4.txt'
+ms.print_to_sequence_file()
+ms.run_animation(delay=5)
+
+
+"""
 try:
     #mode = 'stable'
-    #ms.body_movement(0, 0, 19)
+    mode = 'stable130'
+    #ms.body_movement(0, 0, 6)
     #move_legs_z(ms, [3, 3, -3, -3], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
     #move_legs_z(ms, [-6, -6, 6, 6], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
     #move_legs_z(ms, [3, 3, -3, -3], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
     #mode = 'moving'
-    #move_body_straight(ms, 4, 0, body_to_center=True)
-    mode = 'stable'
-    ms.body_movement(0, 0, -19)
+    move_body_straight(ms, 4, 0, body_to_center=True)
+    #mode = 'stable'
+    #ms.body_movement(0, 0, -6)
     #move_body_straight(ms, 2, 0, body_to_center=True)
     #turn_body(ms, 15)
     
     ms.print_to_sequence_file()
+    print('############################# Success #############################')
     pass
 except:
     print('Fail')
 
 ms.run_animation(delay=5)
+"""
