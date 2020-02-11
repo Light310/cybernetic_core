@@ -73,14 +73,14 @@ def check_angles(angles, mode):
     beta = rad_to_angle(angles[1])
     gamma = rad_to_angle(angles[2])
     angles_converted = str([round(x, 2) for x in [alpha, beta, gamma]])
-    if alpha < -70 or alpha > 80:
+    if alpha < -90 or alpha > 70:
         return False, angles_converted + ' alpha={0}'.format(alpha)
-    if beta < -120 or beta > 80:
+    if beta < -125 or beta > 125:
         return False,  angles_converted + '. beta={0}'.format(beta)
-    if gamma < -90 or gamma > 15: # 15 is cuz of construction of last joint
+    if gamma < -120 or gamma > 5: # 15 is cuz of construction of last joint
         return False, angles_converted + '. gamma={0}'.format(gamma)
-    if alpha + beta < -110 or alpha + beta > 80:
-        return False, angles_converted + '. alpha + beta = {0}'.format(alpha + beta)
+    #if alpha + beta < -110 or alpha + beta > 80:
+    #    return False, angles_converted + '. alpha + beta = {0}'.format(alpha + beta)
     
     if mode is None:
         mode = 10
@@ -118,8 +118,8 @@ def find_angles(Dx, Dy, prev_ksi=None):
     from_angle = -40.0
     to_angle = 40.0
     if prev_ksi:
-        from_angle = max(from_angle, prev_ksi - 2.0)
-        to_angle = min(to_angle, prev_ksi + 2.0)
+        from_angle = max(from_angle, prev_ksi - 3.0)
+        to_angle = min(to_angle, prev_ksi + 3.0)
         #print(f'Trying angles : {from_angle}, {to_angle}')
 
     for k in np.arange(from_angle, to_angle, 0.01):
@@ -167,10 +167,10 @@ def get_angles_distance(angles1, angles2):
     # angles sent in radians
     # adding difference of last join from perpendicular as a critical value
     # do I need SQRT? WTF?
-    return (angles1[0] - angles2[0]) ** 2 + \
+    return math.sqrt((angles1[0] - angles2[0]) ** 2 + \
            (angles1[1] - angles2[1]) ** 2 + \
            (angles1[2] - angles2[2]) ** 2 + \
-           3 * abs(rad_to_angle(angles1[0] + angles1[1] + angles1[2] + 90) ** 2)
+           3 * abs(rad_to_angle(angles1[0] + angles1[1] + angles1[2]) + 90) ** 2)
 
 
 def angles_str(angles):

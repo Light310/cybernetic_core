@@ -8,6 +8,7 @@ import copy
 
 from animation import animate
 from angles_processing import get_leg_angles, angles_str, target_alpha, target_beta, target_gamma
+#from a_processing import get_leg_angles, angles_str, target_alpha, target_beta, target_gamma
 from common import a, b, c, d, angle_to_rad, rad_to_angle, create_sequence_file
 
 
@@ -323,7 +324,8 @@ class Leg:
         delta_z = D.z - O.z
 
         global mode
-        alpha, beta, gamma = get_leg_angles(l, delta_z, [self.alpha, self.beta, self.gamma], mode=mode)
+        #alpha, beta, gamma = get_leg_angles(l, delta_z, [self.alpha, self.beta, self.gamma], mode=mode)
+        alpha, beta, gamma = get_leg_angles(l, delta_z, [self.alpha, self.beta, self.gamma], mode)
 
         Bx = a * cos(alpha)
         By = a * sin(alpha)
@@ -721,10 +723,10 @@ z_up = 8
 mode = 40
 """
 margin = 4
-ground_z = -10
+ground_z = -18
 initial_ground_z = -3
-k = 16
-z_up = 8
+k = 14
+z_up = 5
 mode = 40
 
 
@@ -747,6 +749,7 @@ import datetime
 time1 = datetime.datetime.now()
 ms = create_new_ms(step=0.2)
 move_body_straight(ms, 0, 8, leg_seq=[1,4,2,3], body_to_center=True)
+#move_body_straight(ms, 16, 0, body_to_center=True)
 
 time2 = datetime.datetime.now()
 print(time2 - time1)
@@ -769,7 +772,7 @@ ms = create_new_ms(step=0.2)
 turn_body(ms, 25)
 sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\turn_ccw_25.txt'
 ms.print_to_sequence_file(sequence_file)
-
+"""
 #z_up = 7
 mode = 40
 ms = create_new_ms(step=0.2)
@@ -778,6 +781,7 @@ deactivation_move_z = ground_z - initial_ground_z
 ms.body_movement(0, 0, deactivation_move_z)
 sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\deactivation.txt'
 ms.print_to_sequence_file(sequence_file)
+
 
 #k = k + 3
 #z_up = 7
@@ -791,6 +795,7 @@ ms.body_movement(0, 0, activation_move_z)
 sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\activation.txt'
 ms.print_to_sequence_file(sequence_file)
 
+"""
 ms = create_new_ms(step=0.2)
 m = 8
 move_legs_z(ms, [m, -m, -m, m], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])

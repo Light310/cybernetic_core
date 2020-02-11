@@ -3,7 +3,7 @@ from math import pi
 
 a = 10.5
 b = 5.4
-c = 12.2
+c = 14.4
 d = 5.4
 
 def angle_to_rad(angle):
