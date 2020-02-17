@@ -12,7 +12,10 @@ from angles_processing import get_leg_angles, angles_str, target_alpha, target_b
 from common import a, b, c, d, angle_to_rad, rad_to_angle, create_sequence_file
 
 
-# initial_ground_z = -3 # - deactivated mode
+mode = 40
+margin = 5
+z_up = 6
+k = 13
 
 turn_angle = pi / 96
 # phi_angle = 15
@@ -360,7 +363,7 @@ class Leg:
 
 
 class MovementSequence:
-    def __init__(self, Leg1, Leg2, Leg3, Leg4, step=0.5):
+    def __init__(self, Leg1, Leg2, Leg3, Leg4, ground_z, step=0.5):
         self.step = step
         self.ground_z = ground_z
         self.mass_center_distance = 0
@@ -573,6 +576,10 @@ class MovementSequence:
     def run_animation(self, delay=100):
         animate(self.lines_history, delay)
 
+    def sleep(self, iterations):
+        for _ in range(iterations):
+            self.post_movement_actions()
+
 
 def ms_to_array(ms):
     ms_array = []
@@ -590,39 +597,25 @@ def ms_to_array(ms):
     return ms_array
 
 
-def create_new_ms(step=0.5, ms_array=None):
+def create_new_ms(ground_z, k, step=0.5):
     leg_distance = 3.9
-    if ms_array is None:
-        O1 = Point(leg_distance, leg_distance, 0)
-        D1 = Point(k, k, ground_z)
-        Leg1 = Leg(1, "Leg1", O1, D1, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
+    O1 = Point(leg_distance, leg_distance, 0)
+    D1 = Point(k, k, ground_z)
+    Leg1 = Leg(1, "Leg1", O1, D1, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
 
-        O2 = Point(leg_distance, -leg_distance, 0)
-        D2 = Point(k, -k, ground_z)
-        Leg2 = Leg(2, "Leg2", O2, D2, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
+    O2 = Point(leg_distance, -leg_distance, 0)
+    D2 = Point(k, -k, ground_z)
+    Leg2 = Leg(2, "Leg2", O2, D2, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
 
-        O3 = Point(-leg_distance, -leg_distance, 0)
-        D3 = Point(-k, -k, ground_z)
-        Leg3 = Leg(3, "Leg3", O3, D3, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
+    O3 = Point(-leg_distance, -leg_distance, 0)
+    D3 = Point(-k, -k, ground_z)
+    Leg3 = Leg(3, "Leg3", O3, D3, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
 
-        O4 = Point(-leg_distance, leg_distance, 0)
-        D4 = Point(-k, k, ground_z)
-        Leg4 = Leg(4, "Leg4", O4, D4, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
-    else:
-        for i in range(4):
-            leg = ms_array[i]
-            O = Point(leg[0], leg[1], leg[2])
-            D = Point(leg[3], leg[4], leg[5])
-            if i == 0:
-                Leg1 = Leg(1, "Leg1", O, D, leg[6], leg[7], leg[8])
-            if i == 1:
-                Leg2 = Leg(2, "Leg2", O, D, leg[6], leg[7], leg[8])
-            if i == 2:
-                Leg3 = Leg(3, "Leg3", O, D, leg[6], leg[7], leg[8])
-            if i == 3:
-                Leg4 = Leg(4, "Leg4", O, D, leg[6], leg[7], leg[8])
+    O4 = Point(-leg_distance, leg_distance, 0)
+    D4 = Point(-k, k, ground_z)
+    Leg4 = Leg(4, "Leg4", O4, D4, angle_to_rad(target_alpha), angle_to_rad(target_beta), angle_to_rad(target_gamma))
 
-    return MovementSequence(Leg1, Leg2, Leg3, Leg4, step=step)
+    return MovementSequence(Leg1, Leg2, Leg3, Leg4, ground_z, step=step)
 
 
 def body_compensation_for_leg_delta(ms, leg_num, leg_delta):
@@ -699,7 +692,7 @@ def turn_body(ms, angle_deg):
 
 
 def move_body_straight(ms, delta_x, delta_y, leg_seq=[1, 2, 3, 4], body_to_center=False):
-    print(f'(x, y) = ({delta_x}, {delta_y}). margin = {margin}, k = {k}, ground_z = {ground_z}, mode = {mode}')
+    #print(f'(x, y) = ({delta_x}, {delta_y}). margin = {margin}, k = {k}, ground_z = {ground_z}, mode = {mode}')
 
     for leg in leg_seq:
         leg_move_with_compensation(ms, leg, delta_x, delta_y)
@@ -721,7 +714,7 @@ initial_ground_z = -4
 k = 16
 z_up = 8
 mode = 40
-"""
+
 margin = 4
 ground_z = -18
 initial_ground_z = -3
@@ -735,12 +728,12 @@ mode = 40
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\strafe_right_8.txt'
 #ms.print_to_sequence_file()
 
-"""
+
 ms = create_new_ms(step=0.2)
 move_body_straight(ms, -2, 0, leg_seq=[4,3,2,1], body_to_center=True)
 #sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\strafe_left_8.txt'
 #ms.print_to_sequence_file(sequence_file)
-"""
+
 import datetime
 
 #ms = create_new_ms(step=0.2)
@@ -757,7 +750,7 @@ print(time2 - time1)
 sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\forward_8.txt'
 ms.print_to_sequence_file(sequence_file)
 
-"""
+
 ms = create_new_ms(step=0.2)
 move_body_straight(ms, 0, -6, leg_seq=[3,2,4,1], body_to_center=True)
 sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\backward_8.txt'
@@ -772,7 +765,7 @@ ms = create_new_ms(step=0.2)
 turn_body(ms, 25)
 sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\turn_ccw_25.txt'
 ms.print_to_sequence_file(sequence_file)
-"""
+
 #z_up = 7
 mode = 40
 ms = create_new_ms(step=0.2)
@@ -795,7 +788,7 @@ ms.body_movement(0, 0, activation_move_z)
 sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\activation.txt'
 ms.print_to_sequence_file(sequence_file)
 
-"""
+
 ms = create_new_ms(step=0.2)
 m = 8
 move_legs_z(ms, [m, -m, -m, m], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
@@ -817,24 +810,24 @@ move_legs_z(ms, [-4*b, -2*b, 0, -2*b], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Le
 move_legs_z(ms, [2*b, b, 0, b], leg_seq=[ms.Leg1, ms.Leg2, ms.Leg3, ms.Leg4])
 sequence_file = 'D:\\Development\\Python\\cybernetic_core\\sequences\\yaw.txt'
 ms.print_to_sequence_file(sequence_file)
-"""
+
 ms.run_animation(delay=5)
 
 #ms = create_new_ms(step=0.5)
 
-"""
+
 try:
     ms = create_new_ms(step=0.2)
     move_body_straight(ms, 4, 0, body_to_center=True)
 except:
     print('Fail')
-"""
+
 #ms.run_animation(delay=5)
 #for item in ms.mh.angles_history:
 #    print(item)
 
 
-"""
+
 try:    
     #mode = 'stable'
     mode = 'stable130'

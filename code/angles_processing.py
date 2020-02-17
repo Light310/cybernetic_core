@@ -87,21 +87,7 @@ def check_angles(angles, mode):
 
     if alpha + beta + gamma < -90 - mode or alpha + beta + gamma > -90 + mode:
             return False, f'{angles_converted}. mode {mode}. alpha + beta + gamma = {alpha + beta + gamma}'
-    """
-    if mode == 'stable130':
-        if alpha + beta + gamma < -130 or alpha + beta + gamma > -50:
-            return False, angles_converted + '. stable130 mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
-    elif mode == 'stable120':
-        if alpha + beta + gamma < -120 or alpha + beta + gamma > -60:
-            return False, angles_converted + '. stable120 mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
-    elif mode == 'stable115':
-        if alpha + beta + gamma < -115 or alpha + beta + gamma > -65:
-            return False, angles_converted + '. stable115 mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
-    else:
-        if alpha + beta + gamma < -110 or alpha + beta + gamma > -70:
-            return False, angles_converted + '. stable110 mode. alpha + beta + gamma = {0}'.format(alpha + beta + gamma)
-    """
-    
+        
     return True, 'All ok'
 
 
@@ -117,12 +103,14 @@ def find_angles(Dx, Dy, prev_ksi=None):
     #for k in np.arange(-35.0, 35.0, 0.1):
     from_angle = -40.0
     to_angle = 40.0
+    angle_step = 1.0
     if prev_ksi:
         from_angle = max(from_angle, prev_ksi - 3.0)
         to_angle = min(to_angle, prev_ksi + 3.0)
+        angle_step = 0.01
         #print(f'Trying angles : {from_angle}, {to_angle}')
 
-    for k in np.arange(from_angle, to_angle, 0.01):
+    for k in np.arange(from_angle, to_angle, angle_step):
 
         ksi = angle_to_rad(k)
 
