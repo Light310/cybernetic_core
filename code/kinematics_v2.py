@@ -12,7 +12,7 @@ from angles_processing import get_leg_angles, angles_str, target_alpha, target_b
 from common import a, b, c, d, angle_to_rad, rad_to_angle, create_sequence_file
 
 
-mode = 40
+mode = 90
 margin = 5
 z_up = 6
 k = 13
@@ -566,6 +566,14 @@ class MovementSequence:
             Leg.move_end_point(delta[0], delta[1], delta[2])
     
     def print_to_sequence_file(self, sequence_file):
+        for item in self.mh.angles_history:
+            for index, value in enumerate(item):
+                if index in [3, 7, 11, 15]:
+                    if abs(value) > 45:
+                        raise Exception(f'Bad value : ({index}){value} in {item}')
+                else:
+                    if abs(value) > 135:
+                        raise Exception(f'Bad value : ({index}){value} in {item}')
         with open(sequence_file, 'w') as f:
             f.write('\n'.join(str(x) for x in self.mh.angles_history))
     

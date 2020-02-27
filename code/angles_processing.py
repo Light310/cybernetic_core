@@ -77,7 +77,7 @@ def check_angles(angles, mode):
         return False, angles_converted + ' alpha={0}'.format(alpha)
     if beta < -125 or beta > 125:
         return False,  angles_converted + '. beta={0}'.format(beta)
-    if gamma < -120 or gamma > 5: # 15 is cuz of construction of last joint
+    if gamma < -120 or gamma > 0: # 15 is cuz of construction of last joint
         return False, angles_converted + '. gamma={0}'.format(gamma)
     #if alpha + beta < -110 or alpha + beta > 80:
     #    return False, angles_converted + '. alpha + beta = {0}'.format(alpha + beta)
@@ -101,8 +101,8 @@ def find_angles(Dx, Dy, prev_ksi=None):
         #sys.exit(1)
 
     #for k in np.arange(-35.0, 35.0, 0.1):
-    from_angle = -40.0
-    to_angle = 40.0
+    from_angle = -90.0
+    to_angle = 90.0
     angle_step = 1.0
     if prev_ksi:
         from_angle = max(from_angle, prev_ksi - 3.0)
@@ -146,8 +146,8 @@ def find_angles(Dx, Dy, prev_ksi=None):
                     continue
 
                 results.append([alpha, beta, gamma])
-                if abs(rad_to_angle(alpha+beta+gamma) - k + 90) > 0.1:
-                    print(f'wtf {rad_to_angle(alpha+beta+gamma)}. {k}. {abs(rad_to_angle(alpha+beta+gamma) - k + 90)}')
+                #if abs(rad_to_angle(alpha+beta+gamma) - k + 90) > 0.1:
+                #    print(f'wtf {rad_to_angle(alpha+beta+gamma)}. {k}. {abs(rad_to_angle(alpha+beta+gamma) - k + 90)}')
 
     return results
 
